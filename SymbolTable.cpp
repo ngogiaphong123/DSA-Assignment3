@@ -92,12 +92,12 @@ bool hashTable :: insert(Data data,int& across) {
 void hashTable :: print() {
     bool first = true;
     for(int i = 0; i < this->size; i++) {
-        if(table[i].flag == "OCCUPIED" && first == true) {
+        if(table[i].flag == "OCCUPIED" && first == true && table[i].level != -1) {
             cout << i << " " << table[i].name << "//"<<table[i].level;
             first = false;
 
         }
-        else if(table[i].flag == "OCCUPIED") {
+        else if(table[i].flag == "OCCUPIED" &&table[i].level != -1) {
             cout << ";" << i << " " << table[i].name << "//" << table[i].level;
         }
     }
@@ -189,10 +189,17 @@ void SymbolTable::run(string filename)
             currLevel ++;
         }
         else if(cmd[0] == "END") {
+            int levelDeleted = currLevel;
             currLevel--;
             if(currLevel < 0) {
                 delete[] cmd;
                 throw UnknownBlock();
+            }
+            for(int i = 0 ; i < table.size ; i++) {
+                if(table.table[i].level == levelDeleted) {
+                    table.table[i].flag = "DELETED";
+                    table.table[i].level = -1;
+                }
             }
         }
         else if(cmd[0] == "LOOKUP") {
