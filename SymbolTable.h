@@ -85,6 +85,7 @@ struct hashTable {
     }
     bool insert(Data data,int& across);
     void print();
+    int search(string name,int currLevel);
     ~hashTable() {
         delete[] table;
         this->size = 0;

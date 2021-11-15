@@ -25,6 +25,12 @@ string* tokenize(string input, string del = " ") {
     return cmd;
 }
 //CHECK CONDITION
+bool checkHashTableType(string value) {
+    if(value == "LINEAR" || value == "QUADRATIC" || value == "DOUBLE") {
+        return true;
+    }
+    return false;
+}
 bool checkStringValue(string value) {
     regex archetype("\\'[a-zA-Z0-9 ]*\\'");
     if(regex_match(value,archetype)==true) return true;
@@ -97,6 +103,19 @@ void hashTable :: print() {
     }
     return;
 }
+int hashTable :: search(string name,int currLevel) {
+    int i = 0;
+    int key = preHash(name,currLevel);
+    while(i != this->size) {
+        int j = hash(key,i);
+        if(table[j].flag == "NIL") break;
+        if(table[j].name == name) {
+                return j;
+        }
+        i++;
+    }
+    return -1;
+}
 void SymbolTable::run(string filename)
 {
     int currLevel = 0;
@@ -105,6 +124,10 @@ void SymbolTable::run(string filename)
     ifstream file(filename);
     getline(file, temp);
     string* cmd = tokenize(temp);
+    if(checkHashTableType(cmd[0]) == false) {
+        delete[] cmd;
+        throw InvalidInstruction(temp);
+    }
     if(numberOfWords(temp) == 3) {
         table.setLinearDouble(cmd[0],cmd[1],cmd[2]);
     }
@@ -171,7 +194,17 @@ void SymbolTable::run(string filename)
             }
         }
         else if(cmd[0] == "LOOKUP") {
-
+            if(checkIdentifierName(cmd[1]) == false) {
+                delete[] cmd;
+                throw InvalidInstruction(temp);
+            }
+            string name = cmd[1];
+            int index = table.search(name,currLevel);
+            if(index == -1) {
+                delete[] cmd;
+                throw Undeclared(name);
+            }
+            cout << index << endl;
         }
         else if(cmd[0] == "PRINT") {
             table.print();
