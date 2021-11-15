@@ -104,17 +104,19 @@ void hashTable :: print() {
     return;
 }
 int hashTable :: search(string name,int currLevel) {
-    int i = 0;
-    int key = preHash(name,currLevel);
-    while(i != this->size) {
-        int j = hash(key,i);
-        if(table[j].flag == "NIL") break;
-        if(table[j].name == name) {
-                return j;
+    for(int k = currLevel ; k >= 0; k--) {
+        int i = 0;
+        int key = preHash(name,k);
+        while(i != this->size) {
+            int j = hash(key,i);
+            if(table[j].flag == "NIL") break;
+            if(table[j].name == name) {
+                    return j;
+            }
+            i++;
         }
-        i++;
+        return -1;
     }
-    return -1;
 }
 void SymbolTable::run(string filename)
 {
