@@ -115,8 +115,8 @@ int hashTable :: search(string name,int currLevel) {
             }
             i++;
         }
-        return -1;
     }
+    return -1;
 }
 void SymbolTable::run(string filename)
 {
