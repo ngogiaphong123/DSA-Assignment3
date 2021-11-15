@@ -84,6 +84,7 @@ struct hashTable {
         else return -1;
     }
     bool insert(Data data,int& across);
+    void print();
     ~hashTable() {
         delete[] table;
         this->size = 0;
