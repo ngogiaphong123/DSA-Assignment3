@@ -122,7 +122,7 @@ void SymbolTable::run(string filename)
             }
             if(numberOfWords(temp) == 2) {
                 int key = preHash(cmd[1],currLevel);
-                Data data(cmd[1],currLevel,"auto",key,"","OCCUPIED",0);
+                Data data(cmd[1],currLevel,"auto",key,"","OCCUPIED","0");
                 int across = 0;
                 if(table.insert(data,across) == false) {
                     if(across == -1) {
