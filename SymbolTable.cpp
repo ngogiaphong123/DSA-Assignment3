@@ -109,7 +109,7 @@ void SymbolTable::run(string filename)
                 if(table.insert(data,across) == false) {
                     if(across == -1) {
                         delete[] cmd;
-                        throw Redeclared(temp);
+                        throw Redeclared(data.name);
                     }
                     else throw Overflow(temp);
                 }
@@ -123,7 +123,7 @@ void SymbolTable::run(string filename)
                 if(table.insert(data,across) == false) {
                     if(across == -1) {
                         delete[] cmd;
-                        throw Redeclared(temp);
+                        throw Redeclared(data.name);
                     }
                     else throw Overflow(temp);
                 }
