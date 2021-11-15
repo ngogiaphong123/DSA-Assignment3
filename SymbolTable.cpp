@@ -83,6 +83,20 @@ bool hashTable :: insert(Data data,int& across) {
     }
     return false;
 }
+void hashTable :: print() {
+    bool first = true;
+    for(int i = 0; i < this->size; i++) {
+        if(table[i].flag == "OCCUPIED" && first == true) {
+            cout << i << " " << table[i].name << "//"<<table[i].level;
+            first = false;
+
+        }
+        else if(table[i].flag == "OCCUPIED") {
+            cout << ";" << i << " " << table[i].name << "//" << table[i].level;
+        }
+    }
+    return;
+}
 void SymbolTable::run(string filename)
 {
     int currLevel = 0;
@@ -135,7 +149,13 @@ void SymbolTable::run(string filename)
             }
         }
         else if(cmd[0] == "ASSIGN") {
-
+            int numberWordsAssign = numberOfWords(temp);
+            if(numberWordsAssign > 3) {
+                for(int i = 3 ; i < numberWordsAssign ; i++) {
+                    cmd[2] = cmd[2] + " " + cmd[i];
+                }
+                numberWordsAssign = 3;
+            }
         }
         else if(cmd[0] == "CALL") {
 
@@ -154,7 +174,7 @@ void SymbolTable::run(string filename)
 
         }
         else if(cmd[0] == "PRINT") {
-
+            table.print();
         }
         else {
             delete[] cmd;
