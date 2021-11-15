@@ -102,6 +102,10 @@ void SymbolTable::run(string filename)
         }
         cmd = tokenize(temp);
         if(cmd[0] == "INSERT") {
+            if(checkIdentifierName(cmd[1]) == false) {
+                delete[] cmd;
+                throw InvalidInstruction(temp);
+            }
             if(numberOfWords(temp) == 2) {
                 int key = preHash(cmd[1],currLevel);
                 Data data(cmd[1],currLevel,"auto",key,"","OCCUPIED",0);
@@ -137,10 +141,14 @@ void SymbolTable::run(string filename)
 
         }
         else if(cmd[0] == "BEGIN") {
-
+            currLevel ++;
         }
         else if(cmd[0] == "END") {
-
+            currLevel--;
+            if(currLevel < 0) {
+                delete[] cmd;
+                throw UnknownBlock();
+            }
         }
         else if(cmd[0] == "LOOKUP") {
 
