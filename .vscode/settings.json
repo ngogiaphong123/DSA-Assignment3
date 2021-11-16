@@ -4,6 +4,8 @@
         "stack": "cpp",
         "random": "cpp",
         "locale": "cpp",
-        "iostream": "cpp"
+        "iostream": "cpp",
+        "filesystem": "cpp",
+        "new": "cpp"
     }
 }
