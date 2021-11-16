@@ -194,9 +194,10 @@ void SymbolTable::run(string filename)
             if(checkNumberValue(cmd[2]) == true) {
                 int across = 0;
                 int index = table.search(cmd[1],currLevel,across);
+                string t = cmd[1];
                 if(index == -1) {
                     delete[] cmd;
-                    throw Undeclared(cmd[1]);
+                    throw Undeclared(t);
                 }
                 if(!(table.table[index].type == "auto" || table.table[index].type == "number")) {
                     delete[] cmd;
@@ -210,9 +211,10 @@ void SymbolTable::run(string filename)
             else if(checkStringValue(cmd[2]) == true) {
                 int across = 0;
                 int index = table.search(cmd[1],currLevel,across);
+                string t = cmd[1];
                 if(index == -1) {
                     delete[] cmd;
-                    throw Undeclared(cmd[1]);
+                    throw Undeclared(t);
                 }
                 if(!(table.table[index].type == "auto" || table.table[index].type == "string")) {
                     delete[] cmd;
@@ -228,16 +230,18 @@ void SymbolTable::run(string filename)
                 int indexValue = table.search(cmd[2],currLevel,across);
                 int indexAssigned = table.search(cmd[1],currLevel,across);
                 if(indexValue == -1) {
+                    string t = cmd[2];
                     delete[] cmd;
-                    throw Undeclared(cmd[2]);
+                    throw Undeclared(t);
                 }
                 if(table.table[indexValue].type != "number" && table.table[indexValue].type != "string" && table.table[indexValue].type != "auto") {
                     delete[] cmd;
                     throw TypeMismatch(temp);
                 }
                 if(indexAssigned == -1) {
+                    string t = cmd[1];
                     delete[] cmd;
-                    throw Undeclared(cmd[1]);
+                    throw Undeclared(t);
                 }
                 if(table.table[indexAssigned].type != "number" && table.table[indexAssigned].type != "string" && table.table[indexAssigned].type != "auto") {
                     delete[] cmd;
@@ -319,7 +323,8 @@ void SymbolTable::run(string filename)
                     if(indexAssigned == -1) {
                         delete[] arg;
                         delete[] cmd;
-                        throw Undeclared(cmd[1]);
+                        string t = cmd[1];
+                        throw Undeclared(t);
                     }
                     if(table.table[indexAssigned].type == "auto") {
                         delete[] arg;
@@ -365,12 +370,13 @@ void SymbolTable::run(string filename)
                             else type[i] = "string";
                         }
                         else if(checkIdentifierName(arg[i]) == true) {
+                            string t = arg[i];
                             int var = table.search(arg[i],currLevel,across);
                             if(var == -1) {
                                 delete[] type;
                                 delete[] arg;
                                 delete[] cmd;
-                                throw Undeclared(table.table[var].name);
+                                throw Undeclared(t);
                             }
                             else {
                                 if(table.table[var].type == "auto" && type[i] == "auto") {
@@ -403,7 +409,8 @@ void SymbolTable::run(string filename)
                         delete[] type;
                         delete[] arg;
                         delete[] cmd;
-                        throw Undeclared(cmd[1]);
+                        string t = cmd[1];
+                        throw Undeclared(t);
                     }
                     if(table.table[indexAssigned].type == "auto" && returnType == "auto") {
                         delete[] type;
