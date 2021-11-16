@@ -104,6 +104,7 @@ void hashTable :: print() {
             cout << ";" << i << " " << table[i].name << "//" << table[i].level;
         }
     }
+    if(first == false) cout << endl;
     return;
 }
 int hashTable :: search(string name,int currLevel,int& across) {
@@ -137,9 +138,9 @@ void SymbolTable::run(string filename)
         throw InvalidInstruction(temp);
     }
     if(numberOfWords(temp) == 3) {
-        table.setLinearDouble(cmd[0],cmd[1],cmd[2]);
+        table.LinearDouble(cmd[0],cmd[1],cmd[2]);
     }
-    else table.setQuadratic(cmd[0],cmd[1],cmd[2],cmd[3]);
+    else table.Quadratic(cmd[0],cmd[1],cmd[2],cmd[3]);
     while(!file.eof()) {
         getline(file, temp);
         if(temp == "") {
@@ -347,7 +348,6 @@ void SymbolTable::run(string filename)
                     int arrowSignal = typeFunction.find("->");
                     string returnType = typeFunction.substr(arrowSignal+2);
                     typeFunction = typeFunction.substr(0, arrowSignal);
-                    int sizeType = numberOfWords(typeFunction,',');
                     typeFunction = typeFunction.substr(1,typeFunction.length()-2);
                     string* type = tokenize(typeFunction, ",");
                     for(int i = 0 ; i < sizeArg ; i++) {

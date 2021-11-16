@@ -46,14 +46,14 @@ struct hashTable {
         this->size = 0;
         this->table = new Data[this->size];
     }
-    void setLinearDouble(string type,string size,string c1) {
+    void LinearDouble(string type,string size,string c1) {
         this->type = type;
         this->size = stoi(size);
         table = new Data[this->size];
         this->c1 = stoi(c1);
         this->c2 = 0;
     }
-    void setQuadratic(string type,string size,string c1,string c2) {
+    void Quadratic(string type,string size,string c1,string c2) {
         this->type = type;
         this->size = stoi(size);
         table = new Data[this->size];
