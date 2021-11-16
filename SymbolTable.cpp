@@ -348,6 +348,7 @@ void SymbolTable::run(string filename)
                     int arrowSignal = typeFunction.find("->");
                     string returnType = typeFunction.substr(arrowSignal+2);
                     typeFunction = typeFunction.substr(0, arrowSignal);
+                    int sizeType = numberOfWords(typeFunction,',');
                     typeFunction = typeFunction.substr(1,typeFunction.length()-2);
                     string* type = tokenize(typeFunction, ",");
                     for(int i = 0 ; i < sizeArg ; i++) {
@@ -404,6 +405,17 @@ void SymbolTable::run(string filename)
                             }
                         }
                     }
+                    string paraList = "";
+                    for(int i = 0 ; i < sizeType ; i++) {
+                        paraList += type[i];
+                        paraList += ",";
+                    }
+                    paraList.insert(0,"(");
+                    paraList = paraList.substr(0,paraList.length()-1);
+                    paraList += ")->";
+                    if(sizeType == 0) paraList = "()->";
+                    paraList += returnType;
+                    table.table[indexValue].type = paraList;
                     int indexAssigned = table.search(cmd[1],currLevel,across);
                     if(indexAssigned == -1) {
                         delete[] type;
@@ -420,6 +432,12 @@ void SymbolTable::run(string filename)
                     }
                     else {
                         if(table.table[indexAssigned].type == "auto") {
+                            if(returnType == "void") {
+                                delete[] cmd;
+                                delete[] arg;
+                                delete[] type;
+                                throw TypeMismatch(temp);
+                            }
                             table.table[indexAssigned].type = returnType;
                         }
                         else if(returnType == "auto") {
@@ -445,7 +463,146 @@ void SymbolTable::run(string filename)
             }
         }
         else if(cmd[0] == "CALL") {
-
+            if(checkFunctionValue(cmd[1]) == false) {
+                delete[] cmd;
+                throw TypeMismatch(temp);
+            }
+            else {
+                int across = 0;
+                string tmp = cmd[2];
+                int openBracket = tmp.find("(");
+                string functionName = tmp.substr(0, openBracket);
+                tmp = tmp.substr(openBracket);
+                int sizeArg = numberOfWords(tmp,',');
+                tmp = tmp.substr(1, tmp.length()-2);
+                string* arg = tokenize(tmp, ",");
+                int indexValue = table.search(functionName,currLevel,across);
+                if(indexValue == -1) {
+                    delete[] arg;
+                    delete[] cmd;
+                    throw Undeclared(functionName);
+                }
+                if(table.table[indexValue].type == "number" || table.table[indexValue].type == "auto" || table.table[indexValue].type == "string") {
+                    delete[] cmd;
+                    delete[] arg;
+                    throw TypeMismatch(temp);
+                }
+                if(table.table[indexValue].numParameters != sizeArg) {
+                    delete[] cmd;
+                    delete[] arg;
+                    throw TypeMismatch(temp);
+                }
+                string typeFunction = table.table[indexValue].type;
+                if(typeFunction == "function") {
+                    string paraList = "";
+                    for(int i = 0 ; i < sizeArg ; i++) {
+                        if(checkNumberValue(arg[i]) == true) {
+                            paraList += "number,";
+                        }
+                        else if(checkStringValue(arg[i]) == true) {
+                            paraList += "string,";
+                        }
+                        else if(checkIdentifierName(arg[i]) == true) {
+                            int var = table.search(arg[i],currLevel,across);
+                            if(var == -1) {
+                                delete[] arg;
+                                delete[] cmd;
+                                throw Undeclared(arg[i]);
+                            }
+                            paraList += table.table[var].type;
+                            paraList += ",";
+                        }
+                    }
+                    paraList.insert(0,"(");
+                    paraList = paraList.substr(0,paraList.length()-1);
+                    paraList += ")->";
+                    if(sizeArg == 0) paraList = "()->";
+                    paraList += "void";
+                    table.table[indexValue].type = paraList;
+                    cout << across << endl;
+                    delete[] arg;
+                }
+                else {
+                    int arrowSignal = typeFunction.find("->");
+                    string returnType = typeFunction.substr(arrowSignal+2);
+                    if(returnType != "void") {
+                        delete[] arg;
+                        throw TypeMismatch(temp);
+                    }
+                    typeFunction = typeFunction.substr(0, arrowSignal);
+                    int sizeType = numberOfWords(typeFunction,',');
+                    typeFunction = typeFunction.substr(1,typeFunction.length()-2);
+                    string* type = tokenize(typeFunction, ",");
+                    for(int i = 0 ; i < sizeArg ; i++) {
+                        if(checkNumberValue(arg[i]) == true) {
+                            if(!(type[i] == "number" || type[i] == "auto")) {
+                                delete[] type;
+                                delete[] arg;
+                                delete[] cmd;
+                                throw TypeMismatch(temp);
+                            }
+                            else type[i] = "number";
+                        }
+                        else if(checkStringValue(arg[i]) == true) {
+                            if(!(type[i] == "string" || type[i] == "auto")) {
+                                delete[] type;
+                                delete[] arg;
+                                delete[] cmd;
+                                throw TypeMismatch(temp);
+                            }
+                            else type[i] = "string";
+                        }
+                        else if(checkIdentifierName(arg[i]) == true) {
+                            string t = arg[i];
+                            int var = table.search(arg[i],currLevel,across);
+                            if(var == -1) {
+                                delete[] type;
+                                delete[] arg;
+                                delete[] cmd;
+                                throw Undeclared(t);
+                            }
+                            else {
+                                if(table.table[var].type == "auto" && type[i] == "auto") {
+                                    delete[] type;
+                                    delete[] arg;
+                                    delete[] cmd;
+                                    throw TypeCannotBeInfered(temp);
+                                }
+                                else {
+                                    if(type[i] == "auto") {
+                                        type[i] = table.table[var].type;
+                                    }
+                                    else if(table.table[var].type == "auto") {
+                                        table.table[var].type = type[i];
+                                    }
+                                    else {
+                                        if(table.table[var].type != type[i]) {
+                                            delete[] type;
+                                            delete[] arg;
+                                            delete[] cmd;
+                                            throw TypeMismatch(temp);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    string paraList = "";
+                    for(int i = 0 ; i < sizeType ; i++) {
+                        paraList += type[i];
+                        paraList += ",";
+                    }
+                    paraList.insert(0,"(");
+                    paraList = paraList.substr(0,paraList.length()-1);
+                    paraList += ")->";
+                    if(sizeType == 0) paraList = "()->";
+                    paraList += returnType;
+                    table.table[indexValue].type = paraList;
+                    cout << across << endl;
+                    delete[] arg;
+                    delete[] type;
+                }
+            }
         }
         else if(cmd[0] == "BEGIN") {
             currLevel ++;
