@@ -267,15 +267,15 @@ void SymbolTable::run(string filename)
             }
             else if(checkFunctionValue(cmd[2]) == true) {
                 int across = 0;
-                string temp = cmd[2];
-                int openBracket = temp.find("(");
-                string functionName = temp.substr(0, openBracket);
-                temp = temp.substr(openBracket);
-                int sizeArg = numberOfWords(temp,',');
-                temp = temp.substr(1, temp.length()-2);
-                string* arg = tokenize(temp, ",");
+                string tmp = cmd[2];
+                int openBracket = tmp.find("(");
+                string functionName = tmp.substr(0, openBracket);
+                tmp = tmp.substr(openBracket);
+                int sizeArg = numberOfWords(tmp,',');
+                tmp = tmp.substr(1, tmp.length()-2);
+                string* arg = tokenize(tmp, ",");
                 int indexValue = table.search(functionName,currLevel,across);
-                if(indexValue != -1) {
+                if(indexValue == -1) {
                     delete[] arg;
                     delete[] cmd;
                     throw Undeclared(functionName);
@@ -316,6 +316,11 @@ void SymbolTable::run(string filename)
                     paraList += ")->";
                     if(sizeArg == 0) paraList = "()->";
                     int indexAssigned = table.search(cmd[1],currLevel,across);
+                    if(indexAssigned == -1) {
+                        delete[] arg;
+                        delete[] cmd;
+                        throw Undeclared(cmd[1]);
+                    }
                     if(table.table[indexAssigned].type == "auto") {
                         delete[] arg;
                         delete[] cmd;
