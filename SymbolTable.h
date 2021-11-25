@@ -12,7 +12,7 @@ struct Data {
     string name;
     int level;
     string type;
-    int key;
+    long long int key;
     int numParameters;
     string value;
     string flag; // 3 states : NIL,OCCUPIED,DELETED
@@ -25,7 +25,7 @@ struct Data {
         this->flag = "NIL";
         this->numParameters = 0;
     }
-    Data(string name, int level, string type, int key, string value,string flag,string numParameters) {
+    Data(string name, int level, string type, long long int key, string value,string flag,string numParameters) {
         this->name = name;
         this->level = level;
         this->type = type;
@@ -60,18 +60,18 @@ struct hashTable {
         this->c1 = stoi(c1);
         this->c2 = stoi(c2);
     }
-    int linearProbing(int key,int i) {
+    int linearProbing(long long int key,int i) {
         return ((key%size)+c1*i)%size;
     }
-    int quadraticProbing(int key,int i) {
+    int quadraticProbing(long long int key,int i) {
         return ((key%size)+c1*i+c2*i*i)%size;
     }
-    int doubleProbing(int key,int i) {
+    int doubleProbing(long long int key,int i) {
         int h1 = key%size;
         int h2 = 1 + (key%(size-2));
         return (h1+h2*c1*i)%size;
     }
-    int hash(int key,int i) {
+    int hash(long long int key,int i) {
         if(this->type == "LINEAR") {
             return linearProbing(key,i);
         }

@@ -63,7 +63,7 @@ bool checkFunctionType(string value) {
     return false;
 }
 //Process
-int preHash(string value,int currLevel) {
+long long int preHash(string value,int currLevel) {
     string result = "";
     result += to_string(currLevel);
     int length = value.length();
@@ -71,7 +71,7 @@ int preHash(string value,int currLevel) {
         int temp = value[i] - 48;
         result += to_string(temp);
     }
-    return stoi(result);
+    return stoll(result);
 }
 bool hashTable :: insert(Data data,int& across) {
     int i = 0;
@@ -110,7 +110,7 @@ void hashTable :: print() {
 int hashTable :: search(string name,int currLevel,int& across) {
     for(int k = currLevel ; k >= 0; k--) {
         int i = 0;
-        int key = preHash(name,k);
+        long long int key = preHash(name,k);
         while(i != this->size) {
             int j = hash(key,i);
             if(table[j].flag == "NIL") break;
@@ -153,7 +153,7 @@ void SymbolTable::run(string filename)
                 throw InvalidInstruction(temp);
             }
             if(numberOfWords(temp) == 2) {
-                int key = preHash(cmd[1],currLevel);
+                long long int key = preHash(cmd[1],currLevel);
                 Data data(cmd[1],currLevel,"auto",key,"","OCCUPIED","0");
                 int across = 0;
                 if(table.insert(data,across) == false) {
@@ -171,7 +171,7 @@ void SymbolTable::run(string filename)
                     delete[] cmd;
                     throw InvalidDeclaration(t);
                 }
-                int key = preHash(cmd[1],currLevel);
+                long long int key = preHash(cmd[1],currLevel);
                 Data data(cmd[1],currLevel,"function",key,"","OCCUPIED",cmd[2]);
                 int across = 0;
                 if(table.insert(data,across) == false) {
