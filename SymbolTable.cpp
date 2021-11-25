@@ -166,7 +166,11 @@ void SymbolTable::run(string filename)
                 else cout << across << endl;
             }
             else if(numberOfWords(temp) == 3) {
-                if(currLevel != 0) throw InvalidDeclaration(temp);
+                if(currLevel != 0) {
+                    string t = cmd[1];
+                    delete[] cmd;
+                    throw InvalidDeclaration(t);
+                }
                 int key = preHash(cmd[1],currLevel);
                 Data data(cmd[1],currLevel,"function",key,"","OCCUPIED",cmd[2]);
                 int across = 0;
@@ -250,7 +254,7 @@ void SymbolTable::run(string filename)
                 }
                 if(table.table[indexAssigned].type =="auto" && table.table[indexValue].type == "auto") {
                     delete[] cmd;
-                    throw TypeCannotBeInfered(temp);
+                    throw TypeCannotBeInferred(temp);
                 }
                 else {
                     if(table.table[indexAssigned].type == "auto") {
@@ -312,6 +316,11 @@ void SymbolTable::run(string filename)
                                 delete[] cmd;
                                 throw Undeclared(arg[i]);
                             }
+                            if(table.table[var].type == "auto") {
+                                delete[] arg;
+                                delete[] cmd;
+                                throw TypeMismatch(temp);
+                            }
                             paraList += table.table[var].type;
                             paraList += ",";
                         }
@@ -330,7 +339,7 @@ void SymbolTable::run(string filename)
                     if(table.table[indexAssigned].type == "auto") {
                         delete[] arg;
                         delete[] cmd;
-                        throw TypeCannotBeInfered(temp);
+                        throw TypeCannotBeInferred(temp);
                     }
                     else if(table.table[indexAssigned].type == "number" || table.table[indexAssigned].type == "string") {
                         paraList += table.table[indexAssigned].type;
@@ -384,7 +393,7 @@ void SymbolTable::run(string filename)
                                     delete[] type;
                                     delete[] arg;
                                     delete[] cmd;
-                                    throw TypeCannotBeInfered(temp);
+                                    throw TypeCannotBeInferred(temp);
                                 }
                                 else {
                                     if(type[i] == "auto") {
@@ -428,7 +437,7 @@ void SymbolTable::run(string filename)
                         delete[] type;
                         delete[] arg;
                         delete[] cmd;
-                        throw TypeCannotBeInfered(temp);
+                        throw TypeCannotBeInferred(temp);
                     }
                     else {
                         if(table.table[indexAssigned].type == "auto") {
@@ -509,6 +518,11 @@ void SymbolTable::run(string filename)
                                 delete[] cmd;
                                 throw Undeclared(arg[i]);
                             }
+                            if(table.table[var].type == "auto") {
+                                delete[] arg;
+                                delete[] cmd;
+                                throw TypeMismatch(temp);
+                            }
                             paraList += table.table[var].type;
                             paraList += ",";
                         }
@@ -521,7 +535,7 @@ void SymbolTable::run(string filename)
                     table.table[indexValue].type = paraList;
                     cout << across << endl;
                     delete[] arg;
-                }
+                } 
                 else {
                     int arrowSignal = typeFunction.find("->");
                     string returnType = typeFunction.substr(arrowSignal+2);
@@ -566,7 +580,7 @@ void SymbolTable::run(string filename)
                                     delete[] type;
                                     delete[] arg;
                                     delete[] cmd;
-                                    throw TypeCannotBeInfered(temp);
+                                    throw TypeCannotBeInferred(temp);
                                 }
                                 else {
                                     if(type[i] == "auto") {

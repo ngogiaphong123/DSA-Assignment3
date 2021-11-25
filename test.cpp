@@ -1,253 +1,200 @@
-        else if(cmd[0] == "ASSIGN") {
-            int numberWordsAssign = numberOfWords(temp);
-            if(numberWordsAssign > 3) {
-                for(int i = 3 ; i < numberWordsAssign ; i++) {
-                    cmd[2] = cmd[2] + " " + cmd[i];
-                }
-                numberWordsAssign = 3;
-            }
-            if(checkIdentifierName(cmd[1]) == false) {
-                delete[] cmd;
-                throw InvalidInstruction(temp);
-            }
-            if(checkNumberValue(cmd[2]) == true) {
-                int across = 0;
-                int index = table.search(cmd[1],currLevel,across);
-                if(index == -1) {
-                    delete[] cmd;
-                    throw Undeclared(cmd[1]);
-                }
-                if(!(table.table[index].type == "auto" || table.table[index].type == "number")) {
-                    delete[] cmd;
-                    throw TypeMismatch(temp);
-                }
-                else {
-                    table.table[index].type = "number";
-                    cout << across << endl;
-                }
-            }
-            else if(checkStringValue(cmd[2]) == true) {
-                int across = 0;
-                int index = table.search(cmd[1],currLevel,across);
-                if(index == -1) {
-                    delete[] cmd;
-                    throw Undeclared(cmd[1]);
-                }
-                if(!(table.table[index].type == "auto" || table.table[index].type == "string")) {
-                    delete[] cmd;
-                    throw TypeMismatch(temp);
-                }
-                else {
-                    table.table[index].type = "string";
-                    cout << across << endl;
-                }
-            }
-            else if(checkIdentifierName(cmd[2])==true) {
-                int across = 0;
-                int indexValue = table.search(cmd[2],currLevel,across);
-                int indexAssigned = table.search(cmd[1],currLevel,across);
-                if(indexValue == -1) {
-                    delete[] cmd;
-                    throw Undeclared(cmd[2]);
-                }
-                if(table.table[indexValue].type != "number" && table.table[indexValue].type != "string" && table.table[indexValue].type != "auto") {
-                    delete[] cmd;
-                    throw TypeMismatch(temp);
-                }
-                if(indexAssigned == -1) {
-                    delete[] cmd;
-                    throw Undeclared(cmd[1]);
-                }
-                if(table.table[indexAssigned].type != "number" && table.table[indexAssigned].type != "string" && table.table[indexAssigned].type != "auto") {
-                    delete[] cmd;
-                    throw TypeMismatch(temp);
-                }
-                if(table.table[indexAssigned].type =="auto" && table.table[indexValue].type == "auto") {
-                    delete[] cmd;
-                    throw TypeCannotBeInfered(temp);
-                }
-                else {
-                    if(table.table[indexAssigned].type == "auto") {
-                        table.table[indexAssigned].type = table.table[indexValue].type;
-                        cout << across << endl;
-                    }
-                    else if (table.table[indexValue].type == "auto") {
-                        table.table[indexValue].type = table.table[indexAssigned].type;
-                        cout << across << endl;
-                    }
-                    else {
-                        if(table.table[indexValue].type != table.table[indexAssigned].type) {
-                            delete[] cmd;
-                            throw TypeMismatch(temp);
-                        }
-                        else cout << across << endl;
-                    }
-                }
-            }
-            else if(checkFunctionValue(cmd[2]) == true) {
-                int across = 0;
-                string tmp = cmd[2];
-                int openBracket = tmp.find("(");
-                string functionName = tmp.substr(0, openBracket);
-                tmp = tmp.substr(openBracket);
-                int sizeArg = numberOfWords(tmp,',');
-                tmp = tmp.substr(1, tmp.length()-2);
-                string* arg = tokenize(tmp, ",");
-                int indexValue = table.search(functionName,currLevel,across);
-                if(indexValue != -1) {
-                    delete[] arg;
-                    delete[] cmd;
-                    throw Undeclared(functionName);
-                }
-                if(table.table[indexValue].type == "number" || table.table[indexValue].type == "auto" || table.table[indexValue].type == "string") {
-                    delete[] cmd;
-                    delete[] arg;
-                    throw TypeMismatch(temp);
-                }
-                if(table.table[indexValue].numParameters != sizeArg) {
-                    delete[] cmd;
-                    delete[] arg;
-                    throw TypeMismatch(temp);
-                }
-                string typeFunction = table.table[indexValue].type;
-                if(typeFunction == "function") {
-                    string paraList = "";
-                    for(int i = 0 ; i < sizeArg ; i++) {
-                        if(checkNumberValue(arg[i]) == true) {
-                            paraList += "number,";
-                        }
-                        else if(checkStringValue(arg[i]) == true) {
-                            paraList += "string,";
-                        }
-                        else if(checkIdentifierName(arg[i]) == true) {
-                            int var = table.search(arg[i],currLevel,across);
-                            if(var == -1) {
-                                delete[] arg;
-                                delete[] cmd;
-                                throw Undeclared(arg[i]);
-                            }
-                            paraList += table.table[var].type;
-                            paraList += ",";
-                        }
-                    }
-                    paraList.insert(0,"(");
-                    paraList = paraList.substr(0,paraList.length()-1);
-                    paraList += ")->";
-                    if(sizeArg == 0) paraList = "()->";
-                    int indexAssigned = table.search(cmd[1],currLevel,across);
-                    if(table.table[indexAssigned].type == "auto") {
-                        delete[] arg;
-                        delete[] cmd;
-                        throw TypeCannotBeInfered(temp);
-                    }
-                    else if(table.table[indexAssigned].type == "number" || table.table[indexAssigned].type == "string") {
-                        paraList += table.table[indexAssigned].type;
-                        table.table[indexValue].type = paraList;
-                        cout << across << endl;
-                        delete[] arg;
-                    }
-                    else {
-                        delete[] arg;
-                        delete[] cmd;
-                        throw TypeMismatch(temp);
-                    }
-                }
-                else {
-                    int arrowSignal = typeFunction.find("->");
-                    string returnType = typeFunction.substr(arrowSignal+2);
-                    typeFunction = typeFunction.substr(0, arrowSignal);
-                    int sizeType = numberOfWords(typeFunction,',');
-                    typeFunction = typeFunction.substr(1,typeFunction.length()-2);
-                    string* type = tokenize(typeFunction, ",");
-                    for(int i = 0 ; i < sizeArg ; i++) {
-                        if(checkNumberValue(arg[i]) == true) {
-                            if(!(type[i] == "number" || type[i] == "auto")) {
-                                delete[] type;
-                                delete[] arg;
-                                delete[] cmd;
-                                throw TypeMismatch(temp);
-                            }
-                            else type[i] = "number";
-                        }
-                        else if(checkStringValue(arg[i]) == true) {
-                            if(!(type[i] == "string" || type[i] == "auto")) {
-                                delete[] type;
-                                delete[] arg;
-                                delete[] cmd;
-                                throw TypeMismatch(temp);
-                            }
-                            else type[i] = "string";
-                        }
-                        else if(checkIdentifierName(arg[i]) == true) {
-                            int var = table.search(arg[i],currLevel,across);
-                            if(var == -1) {
-                                delete[] type;
-                                delete[] arg;
-                                delete[] cmd;
-                                throw Undeclared(table.table[var].name);
-                            }
-                            else {
-                                if(table.table[var].type == "auto" && type[i] == "auto") {
-                                    delete[] type;
-                                    delete[] arg;
-                                    delete[] cmd;
-                                    throw TypeCannotBeInfered(temp);
-                                }
-                                else {
-                                    if(type[i] == "auto") {
-                                        type[i] = table.table[var].type;
-                                    }
-                                    else if(table.table[var].type == "auto") {
-                                        table.table[var].type = type[i];
-                                    }
-                                    else {
-                                        if(table.table[var].type != type[i]) {
-                                            delete[] type;
-                                            delete[] arg;
-                                            delete[] cmd;
-                                            throw TypeMismatch(temp);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    int indexAssigned = table.search(cmd[1],currLevel,across);
-                    if(indexAssigned == -1) {
-                        delete[] type;
-                        delete[] arg;
-                        delete[] cmd;
-                        throw Undeclared(cmd[1]);
-                    }
-                    if(table.table[indexAssigned].type == "auto" && returnType == "auto") {
-                        delete[] type;
-                        delete[] arg;
-                        delete[] cmd;
-                        throw TypeCannotBeInfered(temp);
-                    }
-                    else {
-                        if(table.table[indexAssigned].type == "auto") {
-                            table.table[indexAssigned].type = returnType;
-                        }
-                        else if(returnType == "auto") {
-                            returnType = table.table[indexAssigned].type;
-                        }
-                        else {
-                            if(returnType != table.table[indexAssigned].type) {
-                                delete[] type;
-                                delete[] arg;
-                                delete[] cmd;
-                                throw TypeMismatch(temp);
-                            }
-                        }
-                    }
-                    cout << across << endl;
-                    delete[] type;
-                    delete[] arg;
-                }
-            }
-            else {
-                delete[] cmd;
-                throw InvalidInstruction(temp);
-            }
+void add(int element)
+{
+    if(this->count==0) {
+        Node* temp = new Node(element);
+        this->head=temp;
+        this->tail=temp;
+        this->count++;
+        return;
+    }
+    Node* temp = new Node(element);
+    tail->next=temp;
+    temp->prev=tail;
+    tail=temp;
+    this->count++;
+    return;
+}
+
+void add(int index, int element)
+{
+    if(index < 0 || index > this->count) throw out_of_range("");
+    if(index==this->count || this->count ==0) {
+        add(element);
+        return;
+    }
+    else if(index==0) {
+        Node* temp=new Node(element);
+        head->prev=temp;
+        temp->next=head;
+        head=temp;
+        this->count++;
+        return;
+    }
+    int i = 0;
+    Node* newNode = new Node(element);
+    Node* pre=this->head;
+    while(pre) {
+        if(i == index - 1) break;
+        pre=pre->next;
+        i++;
+    }
+    Node* curr=pre->next;
+    newNode->next=curr;
+    pre->next=newNode;
+    newNode->prev=pre;
+    curr->prev=newNode;
+    this->count++;
+    return;
+}
+
+int removeAt(int index)
+{
+    if(index < 0 || index >= this->count) throw out_of_range("");
+    if(this->count==0) return -1;
+    if(this->count==1) {
+        int t = head->value;
+        delete this->head;
+        this->head=NULL;
+        this->tail=NULL;
+        this->count=0;
+        return t;
+    }
+    if(index == 0) {
+        Node* temp = head;
+        head = head->next;
+        temp->next=NULL;
+        head->prev=NULL;
+        int t = temp->value;
+        delete temp;
+        this->count--;
+        return t;
+    }
+    else if(index == this->count-1) {
+        Node* temp = tail->prev;
+        temp->next=NULL;
+        tail->prev=NULL;
+        int t = tail->value;
+        delete tail;
+        tail=temp;
+        this->count--;
+        return t;
+    }
+    Node* pre = this->head;
+    int i=0;
+    while(pre){
+        if(i == index -1) break;
+        pre=pre->next;
+        i++;
+    }
+    Node* curr = pre->next;
+    pre->next=curr->next;
+    curr->next->prev=pre;
+    int t = curr->value;
+    curr->next=NULL;
+    curr->prev=NULL;
+    delete curr;
+    this->count--;
+    return t;
+}
+
+bool removeItem(int element)
+{
+    if(this->count==0) return false;
+    int index = 0;
+    Node* temp = this->head;
+    while(temp) {
+        if(temp->value==element) {
+            removeAt(index);
+            return true;
         }
+        temp=temp->next;
+        index++;
+    }
+    return false;
+}
+
+int get(int index)
+{
+    if(index < 0 || index >= this->count) throw out_of_range("");
+    if(this->count==0) return -1;
+    Node* temp = this->head;
+    Node* temp2= this->tail;
+    int i1 = 0 ;
+    int i2 = this->count-1;
+    while(temp && temp2){
+        if(i1 == index) return temp->value;
+        else if(i2 == index) return temp2->value;
+        else {
+            temp=temp->next;
+            temp2=temp2->prev;
+            i2--;
+            i1++;
+        }
+    }
+    return -1;
+}
+
+void set(int index, int element)
+{
+    if(index < 0 || index >=this->count) throw out_of_range("");
+    if(this->count==0)return;
+    int i=0;
+    Node* temp = this->head;
+    while(temp){
+        if(index==i) {
+            temp->value=element;
+            return;
+        }
+        i++;
+        temp=temp->next;
+    }
+    return;
+}
+
+int indexOf(int element)
+{
+    if(this->count==0) return -1;
+    int index = 0;
+    Node* temp = this->head;
+    while(temp) {
+        if(temp->value == element) return index;
+        index++;
+        temp=temp->next;
+    }
+    return -1;
+}
+
+bool contains(int element)
+{
+    if(indexOf(element) != -1) return true;
+    return false;
+}
+
+int size()
+{
+    return this->count;
+}
+
+bool empty()
+{
+    return this->count==0;
+}
+
+void clear() 
+{
+    if(head==NULL) return;
+    while(head != NULL) {
+        Node* p = head;
+        if(head==tail){
+            delete p;
+            break;
+        }
+        head=head->next;
+        p->next = NULL;
+        head->prev=NULL;
+        delete p;
+    }
+    this->head = NULL;
+    this->tail = NULL;
+    this->count=0;
+}

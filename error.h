@@ -119,12 +119,12 @@ public:
     }
 };
 
-class TypeCannotBeInfered : public exception
+class TypeCannotBeInferred : public exception
 {
     string mess;
 
 public:
-    TypeCannotBeInfered(string instruction)
+    TypeCannotBeInferred(string instruction)
     {
         mess = "TypeCannotBeInferred: " + instruction;
     }
