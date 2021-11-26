@@ -1,16 +1,12 @@
 #include <iostream>
 #include <string>
+#include <regex>
 using namespace std;
-long long int preHash(string value,int currLevel) {
-    string result = "";
-    result += to_string(currLevel);
-    int length = value.length();
-    for(int i = 0 ; i < length ; i++) {
-        int temp = value[i] - 48;
-        result += to_string(temp);
-    }
-    return stoll(result);
+bool checkFunctionValue(string value) {
+    regex archetype("[a-z]\\w*(\\(\\)|\\(([a-z]\\w*|\\d+|\\'[a-zA-Z0-9 ]*\\')(,([a-z]\\w*|\\d+|\\'[a-zA-Z0-9 ]*\\'))*\\))");
+    if(regex_match(value,archetype)==true) return true;
+    return false;
 }
 int main() {
-    cout << preHash("mA_AD",0);
+    cout << checkFunctionValue("bo('goEd ',bo,bo)");
 }

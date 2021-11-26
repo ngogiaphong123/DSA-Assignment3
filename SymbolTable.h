@@ -89,6 +89,9 @@ struct hashTable {
     ~hashTable() {
         delete[] table;
         this->size = 0;
+        this->type = "";
+        this->c1 = 0; 
+        this->c2 = 0;
     }
 };
 #endif

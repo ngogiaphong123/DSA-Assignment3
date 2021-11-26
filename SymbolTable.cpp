@@ -141,6 +141,7 @@ void SymbolTable::run(string filename)
         table.LinearDouble(cmd[0],cmd[1],cmd[2]);
     }
     else table.Quadratic(cmd[0],cmd[1],cmd[2],cmd[3]);
+    delete[] cmd;
     while(!file.eof()) {
         getline(file, temp);
         if(temp == "") {
@@ -161,7 +162,10 @@ void SymbolTable::run(string filename)
                         delete[] cmd;
                         throw Redeclared(data.name);
                     }
-                    else throw Overflow(temp);
+                    else {
+                        delete[] cmd;
+                        throw Overflow(temp);
+                    }
                 }
                 else cout << across << endl;
             }
@@ -179,7 +183,10 @@ void SymbolTable::run(string filename)
                         delete[] cmd;
                         throw Redeclared(data.name);
                     }
-                    else throw Overflow(temp);
+                    else {
+                        delete[] cmd;
+                        throw Overflow(temp);
+                    }
                 }
                 else cout << across << endl;
             }
@@ -290,13 +297,13 @@ void SymbolTable::run(string filename)
                     throw Undeclared(functionName);
                 }
                 if(table.table[indexValue].type == "number" || table.table[indexValue].type == "auto" || table.table[indexValue].type == "string") {
-                    delete[] cmd;
                     delete[] arg;
+                    delete[] cmd;
                     throw TypeMismatch(temp);
                 }
                 if(table.table[indexValue].numParameters != sizeArg) {
-                    delete[] cmd;
                     delete[] arg;
+                    delete[] cmd;
                     throw TypeMismatch(temp);
                 }
                 string typeFunction = table.table[indexValue].type;
@@ -316,10 +323,15 @@ void SymbolTable::run(string filename)
                                 delete[] cmd;
                                 throw Undeclared(arg[i]);
                             }
-                            if(table.table[var].type == "auto") {
+                            if(!(table.table[var].type == "auto" || table.table[var].type == "number" || table.table[var].type == "string")) {
                                 delete[] arg;
                                 delete[] cmd;
                                 throw TypeMismatch(temp);
+                            }
+                            if(table.table[var].type == "auto") {
+                                delete[] arg;
+                                delete[] cmd;
+                                throw TypeCannotBeInferred(temp);
                             }
                             paraList += table.table[var].type;
                             paraList += ",";
@@ -474,11 +486,11 @@ void SymbolTable::run(string filename)
         else if(cmd[0] == "CALL") {
             if(checkFunctionValue(cmd[1]) == false) {
                 delete[] cmd;
-                throw TypeMismatch(temp);
+                throw InvalidInstruction(temp);
             }
             else {
                 int across = 0;
-                string tmp = cmd[2];
+                string tmp = cmd[1];
                 int openBracket = tmp.find("(");
                 string functionName = tmp.substr(0, openBracket);
                 tmp = tmp.substr(openBracket);
@@ -492,13 +504,13 @@ void SymbolTable::run(string filename)
                     throw Undeclared(functionName);
                 }
                 if(table.table[indexValue].type == "number" || table.table[indexValue].type == "auto" || table.table[indexValue].type == "string") {
-                    delete[] cmd;
                     delete[] arg;
+                    delete[] cmd;
                     throw TypeMismatch(temp);
                 }
                 if(table.table[indexValue].numParameters != sizeArg) {
-                    delete[] cmd;
                     delete[] arg;
+                    delete[] cmd;
                     throw TypeMismatch(temp);
                 }
                 string typeFunction = table.table[indexValue].type;
@@ -518,10 +530,15 @@ void SymbolTable::run(string filename)
                                 delete[] cmd;
                                 throw Undeclared(arg[i]);
                             }
-                            if(table.table[var].type == "auto") {
+                            if(!(table.table[var].type == "auto" || table.table[var].type == "number" || table.table[var].type == "string")) {
                                 delete[] arg;
                                 delete[] cmd;
                                 throw TypeMismatch(temp);
+                            }
+                            if(table.table[var].type == "auto") {
+                                delete[] arg;
+                                delete[] cmd;
+                                throw TypeCannotBeInferred(temp);
                             }
                             paraList += table.table[var].type;
                             paraList += ",";
@@ -541,6 +558,7 @@ void SymbolTable::run(string filename)
                     string returnType = typeFunction.substr(arrowSignal+2);
                     if(returnType != "void") {
                         delete[] arg;
+                        delete[] cmd;
                         throw TypeMismatch(temp);
                     }
                     typeFunction = typeFunction.substr(0, arrowSignal);
