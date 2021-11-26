@@ -484,6 +484,13 @@ void SymbolTable::run(string filename)
             }
         }
         else if(cmd[0] == "CALL") {
+            int numberWordsAssign = numberOfWords(temp);
+            if(numberWordsAssign > 2) {
+                for(int i = 2 ; i < numberWordsAssign ; i++) {
+                    cmd[1] = cmd[1] + " " + cmd[i];
+                }
+                numberWordsAssign = 2;
+            }
             if(checkFunctionValue(cmd[1]) == false) {
                 delete[] cmd;
                 throw InvalidInstruction(temp);
