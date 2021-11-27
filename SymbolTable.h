@@ -37,10 +37,10 @@ struct Data {
 };
 struct hashTable {
     Data* table;
-    int size;
+    long int size;
     string type;
-    int c1;
-    int c2;
+    long int c1;
+    long int c2;
     hashTable() {
         this->type ="";
         this->size = 0;
@@ -48,17 +48,17 @@ struct hashTable {
     }
     void LinearDouble(string type,string size,string c1) {
         this->type = type;
-        this->size = stoi(size);
+        this->size = stol(size);
         table = new Data[this->size];
-        this->c1 = stoi(c1);
+        this->c1 = stol(c1);
         this->c2 = 0;
     }
     void Quadratic(string type,string size,string c1,string c2) {
         this->type = type;
-        this->size = stoi(size);
+        this->size = stol(size);
         table = new Data[this->size];
-        this->c1 = stoi(c1);
-        this->c2 = stoi(c2);
+        this->c1 = stol(c1);
+        this->c2 = stol(c2);
     }
     int linearProbing(long long int key,int i) {
         return ((key%size)+c1*i)%size;
@@ -87,11 +87,9 @@ struct hashTable {
     void print();
     int search(string name,int currLevel,int& across);
     ~hashTable() {
+        cout << "Desctructor ran";
         delete[] table;
-        this->size = 0;
-        this->type = "";
-        this->c1 = 0; 
-        this->c2 = 0;
+        table = NULL;
     }
 };
 #endif

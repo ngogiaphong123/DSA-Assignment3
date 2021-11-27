@@ -6,6 +6,8 @@
         "locale": "cpp",
         "iostream": "cpp",
         "filesystem": "cpp",
-        "new": "cpp"
+        "new": "cpp",
+        "string": "cpp",
+        "iosfwd": "cpp"
     }
 }

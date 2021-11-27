@@ -132,22 +132,23 @@ void SymbolTable::run(string filename)
     string temp="";
     ifstream file(filename);
     getline(file, temp);
-    string* cmd = tokenize(temp);
-    if(checkHashTableType(cmd[0]) == false) {
-        delete[] cmd;
+    string* cmdRec = tokenize(temp);
+    if(checkHashTableType(cmdRec[0]) == false) {
+        delete[] cmdRec;
+        file.close();
         throw InvalidInstruction(temp);
     }
     if(numberOfWords(temp) == 3) {
-        table.LinearDouble(cmd[0],cmd[1],cmd[2]);
+        table.LinearDouble(cmdRec[0],cmdRec[1],cmdRec[2]);
     }
-    else table.Quadratic(cmd[0],cmd[1],cmd[2],cmd[3]);
-    delete[] cmd;
+    else table.Quadratic(cmdRec[0],cmdRec[1],cmdRec[2],cmdRec[3]);
+    delete[] cmdRec;
     while(!file.eof()) {
         getline(file, temp);
         if(temp == "") {
             throw InvalidInstruction(temp);
         }
-        cmd = tokenize(temp);
+        string* cmd = tokenize(temp);
         if(cmd[0] == "INSERT") {
             if(checkIdentifierName(cmd[1]) == false) {
                 delete[] cmd;
@@ -319,9 +320,10 @@ void SymbolTable::run(string filename)
                         else if(checkIdentifierName(arg[i]) == true) {
                             int var = table.search(arg[i],currLevel,across);
                             if(var == -1) {
+                                string t = arg[i];
                                 delete[] arg;
                                 delete[] cmd;
-                                throw Undeclared(arg[i]);
+                                throw Undeclared(t);
                             }
                             if(!(table.table[var].type == "auto" || table.table[var].type == "number" || table.table[var].type == "string")) {
                                 delete[] arg;
@@ -343,9 +345,9 @@ void SymbolTable::run(string filename)
                     if(sizeArg == 0) paraList = "()->";
                     int indexAssigned = table.search(cmd[1],currLevel,across);
                     if(indexAssigned == -1) {
+                        string t = cmd[1];
                         delete[] arg;
                         delete[] cmd;
-                        string t = cmd[1];
                         throw Undeclared(t);
                     }
                     if(table.table[indexAssigned].type == "auto") {
@@ -439,10 +441,10 @@ void SymbolTable::run(string filename)
                     table.table[indexValue].type = paraList;
                     int indexAssigned = table.search(cmd[1],currLevel,across);
                     if(indexAssigned == -1) {
+                        string t = cmd[1];
                         delete[] type;
                         delete[] arg;
                         delete[] cmd;
-                        string t = cmd[1];
                         throw Undeclared(t);
                     }
                     if(table.table[indexAssigned].type == "auto" && returnType == "auto") {
