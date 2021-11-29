@@ -41,11 +41,6 @@ struct hashTable {
     string type;
     long int c1;
     long int c2;
-    hashTable() {
-        this->type ="";
-        this->size = 0;
-        this->table = new Data[this->size];
-    }
     void LinearDouble(string type,string size,string c1) {
         this->type = type;
         this->size = stol(size);
@@ -86,10 +81,6 @@ struct hashTable {
     bool insert(Data data,int& across);
     void print();
     int search(string name,int currLevel,int& across);
-    ~hashTable() {
-        cout << "Desctructor ran";
-        delete[] table;
-        table = NULL;
-    }
+    ~hashTable();
 };
 #endif

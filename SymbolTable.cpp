@@ -122,8 +122,13 @@ int hashTable :: search(string name,int currLevel,int& across) {
                 i++;
             }
         }
+        across = across - i;
     }
     return -1;
+}
+hashTable :: ~hashTable() {
+    delete[] this->table;
+    this->table = NULL;
 }
 void SymbolTable::run(string filename)
 {
@@ -535,9 +540,10 @@ void SymbolTable::run(string filename)
                         else if(checkIdentifierName(arg[i]) == true) {
                             int var = table.search(arg[i],currLevel,across);
                             if(var == -1) {
+                                string t = arg[i];
                                 delete[] arg;
                                 delete[] cmd;
-                                throw Undeclared(arg[i]);
+                                throw Undeclared(t);
                             }
                             if(!(table.table[var].type == "auto" || table.table[var].type == "number" || table.table[var].type == "string")) {
                                 delete[] arg;
