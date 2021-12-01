@@ -77,7 +77,7 @@ bool hashTable :: insert(Data data,int& across) {
     int i = 0;
     while(i != this->size) {
         int j = hash(data.key,i);
-        if(table[j].name == data.name) {
+        if(table[j].name == data.name && table[j].level == data.level) {
             across = -1;
             return false;
         }
@@ -176,11 +176,6 @@ void SymbolTable::run(string filename)
                 else cout << across << endl;
             }
             else if(numberOfWords(temp) == 3) {
-                if(currLevel != 0) {
-                    string t = cmd[1];
-                    delete[] cmd;
-                    throw InvalidDeclaration(t);
-                }
                 long long int key = preHash(cmd[1],currLevel);
                 Data data(cmd[1],currLevel,"function",key,"","OCCUPIED",cmd[2]);
                 int across = 0;
@@ -189,12 +184,24 @@ void SymbolTable::run(string filename)
                         delete[] cmd;
                         throw Redeclared(data.name);
                     }
-                    else {
+                    if(currLevel != 0) {
+                        string t = cmd[1];
+                        delete[] cmd;
+                        throw InvalidDeclaration(t);
+                    }
+                    if (across != -1) {
                         delete[] cmd;
                         throw Overflow(temp);
                     }
                 }
-                else cout << across << endl;
+                else {
+                    if(currLevel != 0) {
+                        string t = cmd[1];
+                        delete[] cmd;
+                        throw InvalidDeclaration(t);
+                    }
+                    else cout << across << endl;
+                }
             }
         }
         else if(cmd[0] == "ASSIGN") {
